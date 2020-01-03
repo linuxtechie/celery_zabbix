@@ -4,9 +4,9 @@ from setuptools import setup, find_packages
 setup(
     name='celery_zabbix',
     version='1.2.0.dev0',
-    author='Zeit Online',
-    author_email='zon-backend@zeit.de',
-    url='https://github.com/zeitonline/celery_zabbix',
+    author='Zeit Online, linuxtechie',
+    author_email='zon-backend@zeit.de, myself@linuxtechie.com',
+    url='https://github.com/linuxtechie/celery_zabbix',
     description="Sends task execution metrics to Zabbix",
     long_description='\n\n'.join(
         open(x).read() for x in ['README.rst', 'CHANGES.txt']),
@@ -19,7 +19,7 @@ setup(
         'celery',
         'scales',
         'setuptools',
-        'zbxsend',
+        'protobix',
     ],
     extras_require={'test': [
         'mock',

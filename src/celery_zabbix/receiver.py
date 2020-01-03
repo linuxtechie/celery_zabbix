@@ -7,7 +7,8 @@ import logging
 import sys
 import threading
 import time
-import zbxsend
+from protobix.zabbixagentconfig import ZabbixAgentConfig
+from protobix import DataContainer
 
 
 if sys.version_info < (3,):
@@ -140,10 +141,25 @@ class Command(celery.bin.base.Command):
         # Work around bug in zbxsend, they keep the fraction which zabbix
         # then rejects.
         now = int(time.time())
-        metrics = [zbxsend.Metric(self.zabbix_nodename, key, value, now)
-                   for key, value in metrics.items()]
+        zbxSend = ZabbixAgentConfig()
+        container = DataContainer(zbxSend)
+        for key, value in metrics.items():
+            container.add_item(
+                self.zabbix_nodename,
+                key,
+                value,
+                now
+            )
+        (server_success, server_failure, processed, failed, total, time) = container.send()
+        status = "Completed"
+        if int(failed) > 0 :
+            status = "Failed"
+        log.debug("%s Updating %s : %s, time spent: %s", status, host, item, processed)
+
+        # metrics = [zbxsend.Metric(self.zabbix_nodename, key, value, now)
+                #    for key, value in metrics.items()]
         log.debug(metrics)
-        zbxsend.send_to_zabbix(metrics, self.zabbix_server)
+        # zbxsend.send_to_zabbix(metrics, self.zabbix_server)
 
     def check_queue_lengths(self):
         while not self.should_stop:
