@@ -142,6 +142,7 @@ class Command(celery.bin.base.Command):
         # then rejects.
         now = int(time.time())
         zbxSend = ZabbixAgentConfig()
+        zbxSend.data_type = 'items'
         container = DataContainer(zbxSend)
         for key, value in metrics.items():
             container.add_item(
