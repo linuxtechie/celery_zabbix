@@ -150,11 +150,11 @@ class Command(celery.bin.base.Command):
                 value,
                 now
             )
-        (server_success, server_failure, processed, failed, total, time) = container.send()
+        (server_success, server_failure, processed, failed, total, tTime) = container.send()
         status = "Completed"
         if int(failed) > 0 :
             status = "Failed"
-        log.debug("%s Updating %s : %s, time spent: %s", status, host, item, processed)
+        log.debug("{} Updating {} : {}, time spent: {}", status, self.zabbix_nodename, processed, tTime)
 
         # metrics = [zbxsend.Metric(self.zabbix_nodename, key, value, now)
                 #    for key, value in metrics.items()]
