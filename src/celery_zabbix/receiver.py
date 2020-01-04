@@ -24,6 +24,7 @@ else:
 log = logging.getLogger(__name__)
 stats = scales.collection(
     '/celery',
+    scales.IntStat('received'),
     scales.IntStat('started'),
 
     scales.IntStat('succeeded'),
@@ -50,6 +51,11 @@ class Receiver(object):
 
     def __init__(self, app):
         self.app = app
+
+    @task_handler
+    def on_task_received(self, event, task):
+        log.debug('Received %s', task)
+        stats.received += 1
 
     @task_handler
     def on_task_started(self, event, task):
@@ -108,7 +114,7 @@ class Command(celery.bin.base.Command):
                 log.debug(data)
                 metrics = {
                     'celery.task.' + x: data.get(x, 0)
-                    for x in ['started', 'succeeded', 'failed', 'retried']
+                    for x in ['received', 'started', 'succeeded', 'failed', 'retried']
                 }
                 metrics['celery.task.runtime'] = data.get(
                     'runtime', {}).get('median', -1)
